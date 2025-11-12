@@ -1,0 +1,54 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "uSecure GraphQL (Beta) Wrapper",
+    "version": "v0.1",
+    "description": "Generic wrapper for uSecure's invite-only GraphQL API. Requires API URL and x-api-key provided by uSecure."
+  },
+  "servers": [
+    { "url": "https://{your-tenant-subdomain}.api.usecure.io", "variables": {
+      "your-tenant-subdomain": { "default": "example" }
+    } }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": { "type": "apiKey", "in": "header", "name": "x-api-key" }
+    },
+    "schemas": {
+      "GraphQLRequest": {
+        "type": "object",
+        "required": ["query"],
+        "properties": {
+          "query": { "type": "string", "description": "GraphQL query or mutation string" },
+          "variables": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "GraphQLResponse": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "object", "additionalProperties": true },
+          "errors": {
+            "type": "array",
+            "items": { "type": "object", "additionalProperties": true }
+          }
+        }
+      }
+    }
+  },
+  "security": [{ "ApiKeyAuth": [] }],
+  "paths": {
+    "/graphql": {
+      "post": {
+        "operationId": "executeGraphQL",
+        "summary": "Execute a GraphQL query or mutation",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GraphQLRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "GraphQL response", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GraphQLResponse" } } } }
+        }
+      }
+    }
+  }
+}
